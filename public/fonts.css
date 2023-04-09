@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Londrina Outline";
+  src: url("/fonts/LondrinaOutline-Regular.woff2") format("woff2"),
+    url("/fonts/LondrinaOutline-Regular.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+}
