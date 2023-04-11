@@ -1,5 +1,6 @@
 <script>
-  export let cart = [];
+  import { getContext } from "svelte";
+  const cart = getContext("cart");
 </script>
 
 <div class="shopping-cart">
