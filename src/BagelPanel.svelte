@@ -1,171 +1,160 @@
 <script>
+  export let bagel;
+
   import { getContext } from "svelte";
   const cart = getContext("cart");
-
-  let bagels = [
-    {
-      name: "Plain",
-      price: 2.5,
-    },
-    {
-      name: "Spicy Everything",
-      price: 2.5,
-    },
-    {
-      name: "Black & White Sesame",
-      price: 2.5,
-    },
-    {
-      name: "Poppy Seed",
-      price: 2.5,
-    },
-  ];
-
   let spreads = [
     {
-      name: "Plain Cream Cheese",
+      name: "none",
+      price: 0,
+    },
+    {
+      name: "plain cream cheese",
       price: 1.5,
     },
     {
-      name: "Chive Cream Cheese",
+      name: "chive cream cheese",
       price: 1.5,
     },
     {
-      name: "Butter",
+      name: "butter",
       price: 0.5,
     },
     {
-      name: "Vegan Cream Cheese",
+      name: "vegan cream cheese",
       price: 1.5,
     },
     {
-      name: "Vegan Butter",
+      name: "vegan butter",
       price: 0.5,
     },
   ];
+  let selectedSpread = "none";
 
-  function splitOptionsInHalf(options) {
-    const half = Math.ceil(options.length / 2);
-    return [options.slice(0, half), options.slice(half)];
-  }
+  let spreadDisplayPanel = false;
 
-  let selectedBagel;
+  let quantity = 1;
 
-  let selectedSpread;
+  let showQuantityInput = false;
 
-  const resetSelection = () => {
-    selectedBagel = null;
-    selectedSpread = null;
+  const toggleQuantityInput = () => {
+    toggleSpreadDisplay();
+    showQuantityInput = !showQuantityInput;
   };
 
-  const updateCart = (item) => {
+  const toggleSpreadDisplay = () => {
+    spreadDisplayPanel = !spreadDisplayPanel;
+  };
+
+  const updateCart = (quantity) => {
     const existingItem = cart.find(
-      (i) => i.item === item && i.options === selectedSpread
+      (i) => i.item === bagel.name && i.options === selectedSpread
     );
     if (existingItem) {
-      existingItem.quantity++;
+      existingItem.quantity += quantity;
     } else {
-      cart.push({ item: item, options: selectedSpread, quantity: 1 });
+      cart.push({
+        item: bagel.name,
+        options: selectedSpread,
+        quantity: quantity,
+      });
     }
     console.log(cart);
     resetSelection();
   };
 
-  const [bagelsLeft, bagelsRight] = splitOptionsInHalf(bagels);
-  const [spreadsLeft, spreadsRight] = splitOptionsInHalf(spreads);
+  const resetSelection = () => {
+    selectedSpread = "none";
+    quantity = 1;
+
+    toggleQuantityInput();
+    if (spreadDisplayPanel) {
+      toggleSpreadDisplay();
+    }
+  };
 </script>
 
-<div class="panel panel-opacity" style="margin-top: 1.5em;">
-  <div class="level level-heading">
-    <div class="level-item">
-      <h2 class="title is-2">Bagels</h2>
+<div style="margin-bottom: 1em;">
+  <div class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <h3 class="title is-3">{bagel.name}</h3>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        {#if !showQuantityInput}
+          <!-- <div class="field has-addons">
+            <div class="control"> -->
+          <button
+            class="button is-link is-fullwidth"
+            style="background-color: rgb(239 186 171)"
+            on:click={() => toggleQuantityInput()}
+            on:keypress={() => toggleQuantityInput()}
+          >
+            Add to Cart
+          </button>
+          <!-- </div>
+          </div> -->
+        {:else}
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                type="number"
+                class="input is-primary"
+                min="1"
+                bind:value={quantity}
+              />
+            </div>
+            <div class="control">
+              <button
+                class="button is-link is-fullwidth"
+                style="background-color: rgb(239 186 171);"
+                on:click={() => updateCart(quantity)}
+                on:keypress={() => updateCart(quantity)}
+              >
+                Add to Cart
+              </button>
+            </div>
+            <div class="control">
+              <button
+                class="button is-link is-fullwidth"
+                style="background-color: rgb(0, 208, 200);"
+                on:click={() => resetSelection()}
+                on:keypress={() => resetSelection()}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
-
-  <div class="panel-block">
-    {#each bagelsLeft as bagel}
-      <div class="control">
-        <div class="radio is-fullwidth">
-          <label class="radio">
-            <input
-              type="radio"
-              name="bagel"
-              value={bagel.name}
-              bind:group={selectedBagel}
-              required
-            />
-            <strong>{bagel.name}</strong>
-          </label>
-        </div>
-      </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    {#each bagelsRight as bagel}
-      <div class="control">
-        <div class="radio is-fullwidth">
-          <label class="radio">
-            <input
-              type="radio"
-              name="bagel"
-              value={bagel.name}
-              bind:group={selectedBagel}
-              required
-            />
-            <strong>{bagel.name}</strong>
-          </label>
-        </div>
-      </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    {#each spreadsLeft as spread}<div class="control">
-        <div class="radio is-fullwidth">
+  {#if spreadDisplayPanel}
+    <div class="control">
+      {#each spreads as spread}
+        <div class="radio">
           <label class="radio">
             <input
               type="radio"
               name="spread"
               value={spread.name}
+              checked={spread.name === selectedSpread}
+              required
               bind:group={selectedSpread}
+              on:keypress={() => updateCart(quantity)}
             />
             <strong>{spread.name}</strong>
           </label>
         </div>
-      </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    {#each spreadsRight as spread}<div class="control">
-        <div class="radio is-fullwidth">
-          <label class="radio">
-            <input
-              type="radio"
-              name="spread"
-              value={spread.name}
-              bind:group={selectedSpread}
-            />
-            <strong>{spread.name}</strong>
-          </label>
-        </div>
-      </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    <button
-      class="button is-link is-fullwidth"
-      style="background-color: rgb(239 186 171);"
-      on:click={() => updateCart(selectedBagel)}
-      disabled={!selectedBagel}>Add to Cart</button
-    >
-  </div>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
-  .panel-opacity {
-    background-color: rgba(255, 255, 255, 0.7);
-  }
-  .level-heading {
-    padding: 0.5em;
-    background-color: rgb(0, 208, 200);
+  .is-primary {
+    border-color: rgb(0, 208, 200) !important;
   }
 </style>

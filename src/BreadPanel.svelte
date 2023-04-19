@@ -1,113 +1,105 @@
 <script>
   import { getContext } from "svelte";
 
+  export let bread;
+
   // is array
   const cart = getContext("cart");
 
-  const updateCart = (item) => {
-    const existingItem = cart.find((i) => i.item === item);
+  const updateCart = (quantity) => {
+    const existingItem = cart.find((i) => i.item === bread.name);
     if (existingItem) {
-      existingItem.quantity++;
+      existingItem.quantity += quantity;
     } else {
-      cart.push({ item: item, quantity: 1 });
+      cart.push({ item: bread.name, quantity: quantity });
     }
     console.log(cart);
     resetSelection();
   };
 
+  let showQuantityInput = false;
+  let quantity = 1;
+
+  function toggleQuantityInput() {
+    showQuantityInput = !showQuantityInput;
+  }
+
   function resetSelection() {
-    selectedBread = null;
+    toggleQuantityInput();
+    quantity = 1;
   }
-
-  let selectedBread;
-
-  let breads = [
-    {
-      name: "Sourdough",
-      price: 9,
-    },
-    {
-      name: "Whole Wheat",
-      price: 9,
-    },
-    {
-      name: "White",
-      price: 9,
-    },
-    {
-      name: "Rye",
-      price: 9,
-    },
-  ];
-
-  function splitOptionsInHalf(options) {
-    const half = Math.ceil(options.length / 2);
-    return [options.slice(0, half), options.slice(half)];
-  }
-
-  const [breadsLeft, breadsRight] = splitOptionsInHalf(breads);
 </script>
 
-<div class="panel panel-opacity" style="margin-top: 1.5em;">
-  <div class="level level-heading">
-    <div class="level-item">
-      <h2 class="title is-2">Breads</h2>
+<div style="margin-bottom: 1em;">
+  <div class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <h3 class="title is-3">
+          {bread.name}
+        </h3>
+      </div>
     </div>
-  </div>
-  <div class="panel-block">
-    {#each breadsLeft as bread}
-      <div class="control">
-        <div class="radio">
-          <label class="radio">
-            <input
-              type="radio"
-              name="bread"
-              value={bread.name}
-              bind:group={selectedBread}
-            />
-
-            <strong>{bread.name}</strong>
-          </label>
-        </div>
+    <div class="level-right">
+      <div class="level-item">
+        {#if !showQuantityInput}
+          <button
+            class="button is-link is-fullwidth"
+            style="background-color: rgb(239 186 171)"
+            on:click={() => toggleQuantityInput()}
+          >
+            Add to Cart
+          </button>
+        {:else}
+          <div class="field has-addons">
+            <div class="control">
+              <input
+                type="number"
+                class="input"
+                min="1"
+                bind:value={quantity}
+                on:keypress={() => updateCart(quantity)}
+              />
+            </div>
+            <div class="control">
+              <button
+                class="button is-link"
+                style="background-color: rgb(239 186 171);"
+                on:click={() => updateCart(quantity)}
+                on:keypress={() => updateCart(quantity)}
+              >
+                Add to Cart
+              </button>
+            </div>
+            <div class="control">
+              <button
+                class="button is-link is-fullwidth"
+                style="background-color: rgb(0, 208, 200);"
+                on:click={() => resetSelection()}
+                on:keypress={() => resetSelection()}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        {/if}
       </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    {#each breadsRight as bread}
-      <div class="control">
-        <div class="radio">
-          <label class="radio">
-            <input
-              type="radio"
-              name="bread"
-              value={bread.name}
-              bind:group={selectedBread}
-            />
-
-            <strong>{bread.name}</strong>
-          </label>
-        </div>
-      </div>
-    {/each}
-  </div>
-  <div class="panel-block">
-    <button
-      class="button is-link is-fullwidth"
-      style="background-color: rgb(239 186 171)"
-      on:click={() => updateCart(selectedBread)}
-      disabled={!selectedBread}
-    >
-      Add to Cart
-    </button>
+    </div>
   </div>
 </div>
 
-<style>
-  .panel-opacity {
-    background-color: rgba(255, 255, 255, 0.7);
-  }
-  .level-heading {
-    padding: 0.5em;
-    background-color: rgb(0, 208, 200);
-  }
-</style>
+<!-- <div class="panel-block">
+  <div class="control">
+    <div class="radio">
+      <label class="radio">
+        <input
+          type="radio"
+          name="bread"
+          value={bread.name}
+          bind:group={selectedBread}
+        />
+
+        <p class="title is-3">{bread.name}</p>
+      </label>
+    </div>
+  </div>
+</div> -->

@@ -16,21 +16,14 @@
   });
 </script>
 
-<nav
-  class="navabar"
-  style="height: {scrolled
-    ? '50px'
-    : '100px'}; background-color: rgba(0, 0, 0, {scrolled ? 0.7 : 0.9});"
-  aria-label="main navigation"
->
+<nav class="navabar" aria-label="main navigation">
   <div class="navbar-brand level-item">
-    <a class="navbar-item" href="https://bulma.io">
+    <a class="navbar-item" href="/">
       <img
         src="./images/logo.png"
         type="image/png"
-        width={scrolled ? 175 : 300}
+        width="250px"
         alt="Doughpe Eats"
-        style="transition: all 0.5s;"
       /></a
     >
   </div>
